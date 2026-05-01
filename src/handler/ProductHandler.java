@@ -45,6 +45,12 @@ public class ProductHandler implements HttpHandler {
         if (method.equals("GET") && path.startsWith("/products/")) {
             String id = path.replace("/products/", "");
 
+            if(!isNumber(id)) {
+                String message = "O parametro id deve ser um numero valido";
+                sendResponse(exchange, 400, message);
+                return;
+            }
+
             try {
                 Product item = productService.findById(Long.parseLong(id));
                 String jsonString = item.toString();
@@ -60,6 +66,8 @@ public class ProductHandler implements HttpHandler {
                 exchange.getResponseBody().write(response);
                 exchange.getResponseBody().close();
             }
+
+            return;
         }
 
         if (method.equals("POST") && path.equals("/products")) {
@@ -140,5 +148,22 @@ public class ProductHandler implements HttpHandler {
         }
 
         return new Product(null, name, price, quantity);
+    }
+
+    private void sendResponse(HttpExchange exchange, int status, String message) throws IOException {
+        String json = "{\"message\":\"" + message + "\"}";
+        byte[] response = json.getBytes();
+        exchange.sendResponseHeaders(status, response.length);
+        exchange.getResponseBody().write(response);
+        exchange.getResponseBody().close();
+    }
+
+    public static boolean isNumber(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
