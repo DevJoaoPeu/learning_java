@@ -25,7 +25,11 @@ public class ProductHandler implements HttpHandler {
             StringBuilder sb = new StringBuilder("[");
 
             for (Product product : products) {
-                sb.append(product).append(",");
+                if (sb.length() >1) {
+                   sb.append(",");
+                }
+
+                sb.append(product);
             }
 
             sb.append("]");
@@ -39,7 +43,20 @@ public class ProductHandler implements HttpHandler {
         }
 
         if (method.equals("GET") && path.startsWith("/products/")) {
-            // listById
+            String id = path.replace("/products/", "");
+
+            try {
+                Product item = productService.findById(Long.parseLong(id));
+                String jsonString = item.toString();
+
+                byte[] response = jsonString.getBytes();
+                exchange.sendResponseHeaders(200, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
         }
 
         if (method.equals("POST") && path.equals("/products")) {
