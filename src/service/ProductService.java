@@ -15,7 +15,6 @@ public class ProductService {
     }
 
     public Product create (Product product) {
-        validateProduct(product);
         return repository.save(product);
     }
 
@@ -24,40 +23,14 @@ public class ProductService {
     }
 
     public Product findById (Long id) {
-        validateId(id);
-
         return repository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
     }
 
     public Product update (Long id, Product product) {
-        validateId(id);
-        validateProduct(product);
-
         return repository.update(id, product).orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
     }
 
     public boolean deleteById (Long id) {
-        validateId(id);
         return repository.deleteById(id);
-    }
-
-    private void validateId(Long id) {
-        if(id == null || id <= 0) {
-            throw new IllegalArgumentException("Id não pode ser vazio");
-        }
-    }
-
-    private void validateProduct(Product product) {
-        if (product.getName() == null || product.getName().isBlank()) {
-            throw new IllegalArgumentException("Nome não pode ser vazio");
-        }
-
-        if (product.getPrice() < 0) {
-            throw new IllegalArgumentException("Preço não pode ser vazio");
-        }
-
-        if (product.getQuantity() < 0) {
-            throw new IllegalArgumentException("Quantidade não pode ser vazia");
-        }
     }
 }

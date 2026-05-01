@@ -40,6 +40,8 @@ public class ProductHandler implements HttpHandler {
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
             exchange.getResponseBody().close();
+
+            return;
         }
 
         if (method.equals("GET") && path.startsWith("/products/")) {
@@ -72,7 +74,9 @@ public class ProductHandler implements HttpHandler {
 
         if (method.equals("POST") && path.equals("/products")) {
             String body = new String(exchange.getRequestBody().readAllBytes());
-            Product item = productService.create(parseProduct(body));
+            Product parsedBody = parseProduct(body);
+            validateProduct(parsedBody);
+            Product item = productService.create(parsedBody);
 
             String jsonString = item.toString();
 
@@ -80,6 +84,7 @@ public class ProductHandler implements HttpHandler {
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
             exchange.getResponseBody().close();
+            return;
         }
 
         if (method.equals("PUT") && path.startsWith("/products/")) {
@@ -94,6 +99,7 @@ public class ProductHandler implements HttpHandler {
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
             exchange.getResponseBody().close();
+            return;
         }
 
         if (method.equals("DELETE") && path.startsWith("/products/")) {
@@ -122,6 +128,8 @@ public class ProductHandler implements HttpHandler {
                 exchange.getResponseBody().write(response);
                 exchange.getResponseBody().close();
             }
+
+            return;
         }
     }
 
@@ -164,6 +172,12 @@ public class ProductHandler implements HttpHandler {
             return true;
         } catch (NumberFormatException e) {
             return false;
+        }
+    }
+
+    private void validateProduct(Product product) {
+        if (product.getName() == null || product.getName().isBlank()) {
+            throw new IllegalArgumentException("Nome não pode ser vazio");
         }
     }
 }
