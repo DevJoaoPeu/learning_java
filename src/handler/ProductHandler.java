@@ -97,6 +97,12 @@ public class ProductHandler implements HttpHandler {
                 String body = new String(exchange.getRequestBody().readAllBytes());
                 String id = path.replace("/products/", "");
 
+                if(!isNumber(id)) {
+                    String message = "O parametro id deve ser um numero valido";
+                    sendResponse(exchange, 400, message);
+                    return;
+                }
+
                 Product item = productService.update(Long.parseLong(id), parseProduct(body));
 
                 String jsonString = item.toString();
@@ -114,10 +120,16 @@ public class ProductHandler implements HttpHandler {
         if (method.equals("DELETE") && path.startsWith("/products/")) {
             try {
                 String id = path.replace("/products/", "");
+
+                if(!isNumber(id)) {
+                    String message = "O parametro id deve ser um numero valido";
+                    sendResponse(exchange, 400, message);
+                    return;
+                }
+
                 boolean item = productService.deleteById(Long.parseLong(id));
 
                 String message;
-
                 if (item) {
                     message = "Item deletado com sucesso";
                 } else {
