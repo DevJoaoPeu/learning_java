@@ -55,20 +55,90 @@ public class ProductHandler implements HttpHandler {
                 exchange.getResponseBody().close();
             }
             catch (Exception e) {
-                throw new IllegalArgumentException(e.getMessage());
+                byte[] response = e.getMessage().getBytes();
+                exchange.sendResponseHeaders(404, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
             }
         }
 
         if (method.equals("POST") && path.equals("/products")) {
-            // save
+            String body = new String(exchange.getRequestBody().readAllBytes());
+            Product item = productService.create(parseProduct(body));
+
+            String jsonString = item.toString();
+
+            byte[] response = jsonString.getBytes();
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.getResponseBody().close();
         }
 
         if (method.equals("PUT") && path.startsWith("/products/")) {
-            // listAll
+            String body = new String(exchange.getRequestBody().readAllBytes());
+            String id = path.replace("/products/", "");
+
+            Product item = productService.update(Long.parseLong(id), parseProduct(body));
+
+            String jsonString = item.toString();
+
+            byte[] response = jsonString.getBytes();
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.getResponseBody().close();
         }
 
         if (method.equals("DELETE") && path.startsWith("/products/")) {
-            // listAll
+            String id = path.replace("/products/", "");
+
+            try {
+                boolean item = productService.deleteById(Long.parseLong(id));
+
+                String message;
+
+                if (item) {
+                    message = "Item deletado com sucesso";
+                } else {
+                    message = "Falha ao deletar item: " + id;
+                }
+
+                byte[] response = message.getBytes();
+
+//                exchange.sendResponseHeaders(200, response.length());
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
+            }
+            catch (Exception e) {
+                byte[] response = e.getMessage().getBytes();
+                exchange.sendResponseHeaders(404, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
+            }
         }
+    }
+
+    private Product parseProduct(String body) {
+        String cleaned = body.replace("{", "").replace("}", "").replace("\"", "");
+        String[] pairs = cleaned.split(",");
+
+        String name = null;
+        double price = 0;
+        int quantity = 0;
+
+        for (String pair : pairs) {
+            String[] parts = pair.split(":");
+            String key = parts[0].trim();
+            String value = parts[1].trim();
+
+            if (key.equals("name")) {
+                name = value;
+            } else if (key.equals("price")) {
+                price = Double.parseDouble(value);
+            } else if (key.equals("quantity")) {
+                quantity = Integer.parseInt(value);
+            }
+        }
+
+        return new Product(null, name, price, quantity);
     }
 }
