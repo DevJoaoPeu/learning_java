@@ -21,39 +21,43 @@ public class ProductHandler implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
 
         if (method.equals("GET") && path.equals("/products")) {
-            List<Product> products = productService.findAll();
-            StringBuilder sb = new StringBuilder("[");
+            try {
+                List<Product> products = productService.findAll();
+                StringBuilder sb = new StringBuilder("[");
 
-            for (Product product : products) {
-                if (sb.length() >1) {
-                   sb.append(",");
+                for (Product product : products) {
+                    if (sb.length() >1) {
+                       sb.append(",");
+                    }
+
+                    sb.append(product);
                 }
 
-                sb.append(product);
+                sb.append("]");
+
+                String jsonString = sb.toString();
+
+                byte[] response = jsonString.getBytes();
+                exchange.sendResponseHeaders(200, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
+            } catch (RuntimeException e) {
+                sendResponse(exchange, 400, e.getMessage());
             }
-
-            sb.append("]");
-
-            String jsonString = sb.toString();
-
-            byte[] response = jsonString.getBytes();
-            exchange.sendResponseHeaders(200, response.length);
-            exchange.getResponseBody().write(response);
-            exchange.getResponseBody().close();
 
             return;
         }
 
         if (method.equals("GET") && path.startsWith("/products/")) {
-            String id = path.replace("/products/", "");
-
-            if(!isNumber(id)) {
-                String message = "O parametro id deve ser um numero valido";
-                sendResponse(exchange, 400, message);
-                return;
-            }
-
             try {
+                String id = path.replace("/products/", "");
+
+                if(!isNumber(id)) {
+                    String message = "O parametro id deve ser um numero valido";
+                    sendResponse(exchange, 400, message);
+                    return;
+                }
+
                 Product item = productService.findById(Long.parseLong(id));
                 String jsonString = item.toString();
 
@@ -63,49 +67,53 @@ public class ProductHandler implements HttpHandler {
                 exchange.getResponseBody().close();
             }
             catch (Exception e) {
-                byte[] response = e.getMessage().getBytes();
-                exchange.sendResponseHeaders(404, response.length);
-                exchange.getResponseBody().write(response);
-                exchange.getResponseBody().close();
+                sendResponse(exchange, 404, e.getMessage());
             }
 
             return;
         }
 
         if (method.equals("POST") && path.equals("/products")) {
-            String body = new String(exchange.getRequestBody().readAllBytes());
-            Product parsedBody = parseProduct(body);
-            validateProduct(parsedBody);
-            Product item = productService.create(parsedBody);
+            try {
+                String body = new String(exchange.getRequestBody().readAllBytes());
+                Product parsedBody = parseProduct(body);
+                validateProduct(parsedBody);
+                Product item = productService.create(parsedBody);
 
-            String jsonString = item.toString();
+                String jsonString = item.toString();
 
-            byte[] response = jsonString.getBytes();
-            exchange.sendResponseHeaders(200, response.length);
-            exchange.getResponseBody().write(response);
-            exchange.getResponseBody().close();
-            return;
+                byte[] response = jsonString.getBytes();
+                exchange.sendResponseHeaders(200, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
+                return;
+            } catch (IllegalArgumentException e) {
+                sendResponse(exchange, 400, e.getMessage());
+            }
         }
 
         if (method.equals("PUT") && path.startsWith("/products/")) {
-            String body = new String(exchange.getRequestBody().readAllBytes());
-            String id = path.replace("/products/", "");
+            try {
+                String body = new String(exchange.getRequestBody().readAllBytes());
+                String id = path.replace("/products/", "");
 
-            Product item = productService.update(Long.parseLong(id), parseProduct(body));
+                Product item = productService.update(Long.parseLong(id), parseProduct(body));
 
-            String jsonString = item.toString();
+                String jsonString = item.toString();
 
-            byte[] response = jsonString.getBytes();
-            exchange.sendResponseHeaders(200, response.length);
-            exchange.getResponseBody().write(response);
-            exchange.getResponseBody().close();
-            return;
+                byte[] response = jsonString.getBytes();
+                exchange.sendResponseHeaders(200, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.getResponseBody().close();
+                return;
+            } catch (RuntimeException e) {
+                sendResponse(exchange, 400, e.getMessage());
+            }
         }
 
         if (method.equals("DELETE") && path.startsWith("/products/")) {
-            String id = path.replace("/products/", "");
-
             try {
+                String id = path.replace("/products/", "");
                 boolean item = productService.deleteById(Long.parseLong(id));
 
                 String message;
