@@ -104,7 +104,7 @@ public class ProductHandler implements HttpHandler {
 
                 byte[] response = message.getBytes();
 
-//                exchange.sendResponseHeaders(200, response.length());
+                exchange.sendResponseHeaders(200, response.length);
                 exchange.getResponseBody().write(response);
                 exchange.getResponseBody().close();
             }
