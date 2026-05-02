@@ -2,6 +2,8 @@
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
 
     <persistence-unit name="learning_java" transaction-type="RESOURCE_LOCAL">
+        <class>model.Product</class>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/learning_java_db"/>
