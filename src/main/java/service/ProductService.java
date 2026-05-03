@@ -8,11 +8,7 @@ import java.util.List;
 public class ProductService {
     private ProductRepository repository = new ProductRepository();
 
-    public ProductService () {
-        repository.save(new Product(null, "Notebook", 4500.00, 10));
-        repository.save(new Product(null, "TV Smart", 100.00, 5));
-        repository.save(new Product(null, "Bicicleta", 650.00, 1));
-    }
+    public ProductService () {}
 
     public Product create (Product product) {
         return repository.save(product);

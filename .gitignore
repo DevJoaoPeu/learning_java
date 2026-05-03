@@ -30,3 +30,12 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### .env ###
+.env
+
+### build ###
+target/
+
+### database ###
+.postgres-data
