@@ -48,11 +48,7 @@ public class ProductRepository {
 
     public Optional<Product> findById(Long id) {
         EntityManager manager = factory.createEntityManager();
-        String query = "select p from Product p where p.id = :id";
-
-        TypedQuery<Product> queryBuilder = manager.createQuery(query, Product.class);
-        queryBuilder.setParameter("id", id);
-        Product item = queryBuilder.getSingleResult();
+        Product item = manager.find(Product.class, id);
 
         if(item == null) {
             return Optional.empty();
