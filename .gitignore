@@ -39,3 +39,6 @@ target/
 
 ### database ###
 .postgres-data
+
+### Claude ###
+CLAUDE.md
