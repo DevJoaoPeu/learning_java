@@ -1,13 +1,9 @@
-import server.Server;
-import service.ProductService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
-
+@SpringBootApplication
 public class Main {
-    public static void  main (String[] args) throws IOException {
-        ProductService service = new ProductService();
-
-        Server server = new Server(8080, service);
-        server.start();
+    public static void main (String[] args) {
+        SpringApplication.run(Main.class, args);
     }
 }

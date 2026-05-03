@@ -1,14 +1,18 @@
 package service;
 
 import model.Product;
+import org.springframework.stereotype.Service;
 import repository.ProductRepository;
 
 import java.util.List;
 
+@Service
 public class ProductService {
-    private ProductRepository repository = new ProductRepository();
+    private ProductRepository repository;
 
-    public ProductService () {}
+    public ProductService (ProductRepository productRepository) {
+        repository = productRepository;
+    }
 
     public Product create (Product product) {
         return repository.save(product);
@@ -23,10 +27,18 @@ public class ProductService {
     }
 
     public Product update (Long id, Product product) {
-        return repository.update(id, product).orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
+        Product item = repository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
+
+        item.setName(product.getName());
+        item.setPrice(product.getPrice());
+        item.setQuantity(product.getQuantity());
+
+        return repository.save(item);
     }
 
-    public boolean deleteById (Long id) {
-        return repository.deleteById(id);
+    public void deleteById (Long id) {
+        Product item = repository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
+
+        repository.deleteById(id);
     }
 }
