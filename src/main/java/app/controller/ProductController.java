@@ -1,8 +1,8 @@
-package controller;
+package app.controller;
 
-import model.Product;
+import app.model.Product;
 import org.springframework.web.bind.annotation.*;
-import service.ProductService;
+import app.service.ProductService;
 
 import java.util.List;
 

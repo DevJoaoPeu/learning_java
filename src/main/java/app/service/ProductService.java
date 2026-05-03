@@ -1,8 +1,8 @@
-package service;
+package app.service;
 
-import model.Product;
+import app.model.Product;
 import org.springframework.stereotype.Service;
-import repository.ProductRepository;
+import app.repository.ProductRepository;
 
 import java.util.List;
 
