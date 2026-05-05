@@ -26,6 +26,10 @@ public class ProductService {
         return repository.findById(id).orElseThrow(() -> new RuntimeException("Produto com id: " + id + " não encontrado"));
     }
 
+    public List<Product> findByPrice (double price) {
+        return repository.findByPrice(price);
+    }
+
     public Product update (Long id, Product product) {
         Product item = repository.findById(id).orElseThrow(() -> new RuntimeException("Produto com id: " + id + " não encontrado"));
 

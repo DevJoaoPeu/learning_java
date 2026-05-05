@@ -7,7 +7,6 @@ import app.service.ProductService;
 
 import java.util.List;
 
-@ControllerAdvice
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -20,6 +19,11 @@ public class ProductController {
     @GetMapping
     public List<Product> findAll () {
         return productService.findAll();
+    }
+
+    @GetMapping("/search/{price}")
+    public List<Product> findByPrice (@PathVariable double price) {
+        return productService.findByPrice(price);
     }
 
     @GetMapping("/{id}")
